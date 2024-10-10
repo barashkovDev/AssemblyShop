@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{blocks/header :: header}"></div>
+
+<form method="post">
+    <div class="window">
+        <input type="text" class="form-control" name="userName" id="userName" placeholder="Имя пользователя">
+        <input type="password" class="form-control" name="password" id="password" placeholder="Пароль">
+        <div class="button">
+            <button type="submit" name="action" value="reset" id="connectButton" class="btn btn-secondary">Войти</button>
+        </div>
+        <label class="form-label" th:type="${hiddenErrorLabel}" th:text="${messageToUser}"></label>
+    </div>
+    <br>
+</form>
+
+<style>
+    .button{
+        display: flex;
+        justify-content: center;
+    }
+
+    .window{
+        width: 250px;
+        height: 250px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+    }
+
+    input{
+        max-width: 300px;
+        margin: 5px;
+    }
+</style>
+<div>
+    <div th:insert="~{../service/footer :: footer}"></div>
+</div>
+</body>
+</html>

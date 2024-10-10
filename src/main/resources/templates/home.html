@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{service/meta_info :: meta_info}"></div>
+</head>
+<body>
+
+<form method="post">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="submit" id="dropButton" data-bs-toggle="dropdown"
+                aria-expanded="false" name="drop">Выбор режима
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <button class="dropdown-item" name="action" id="1" value="Лабораторные работы"
+                        onclick="changeDropButtonName(this.id)" type="button">Лабораторные работы
+                </button>
+            </li>
+            <li>
+                <button class="dropdown-item" name="action" id="2" value="Курсовая: спортивная школа"
+                        onclick="changeDropButtonName(this.id)" type="button">Курсовая: спортивная школа
+                </button>
+            </li>
+            <li>
+                <button class="dropdown-item" name="action" id="3" value="Курсовая: сборочный цех"
+                        onclick="changeDropButtonName(this.id)" type="button">Курсовая: сборочный цех
+                </button>
+            </li>
+        </ul>
+        <input type="hidden" id="selectTable" name="chosenId" value=""/>
+        <button type="submit" name="action" id="printButton" value="display" th:disabled="${mode}"
+                class="btn btn-secondary">Выбрать
+        </button>
+        <script>
+            function changeDropButtonName(id){
+                document.getElementById("printButton").disabled = false;
+                document.getElementById("dropButton").textContent = document.getElementById(id).getAttribute("value");
+                document.getElementById("selectTable").setAttribute("value",id);
+            }
+        </script>
+    </div>
+</form>
+</body>
+</html>

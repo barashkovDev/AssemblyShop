@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{blocks/header :: header}"></div>
+
+<form method="post">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="submit" id="dropButton" data-bs-toggle="dropdown" aria-expanded="false" name="drop" th:text="${table}">
+        </button>
+        <ul class="dropdown-menu">
+            <li><button class="dropdown-item" name="action" id="1" value="Shop" onclick="changeDropButtonName(this.id)" type="button">Shop</button></li>
+            <li><button class="dropdown-item" name="action" id="2" value="Product" onclick="changeDropButtonName(this.id)" type="button">Products</button></li>
+            <li><button class="dropdown-item" name="action" id="3" value="Available" onclick="changeDropButtonName(this.id)" type="button">Available</button></li>
+        </ul>
+        <input type="hidden" id="selectTable" name="selectTable" th:value="${table}"/>
+        <button type="submit" name="action" id="printButton" value="display" th:disabled="${mode}" class="btn btn-secondary">Отобразить</button>
+        <script>
+            function changeDropButtonName(id){
+                document.getElementById("printButton").disabled = false;
+                document.getElementById("dropButton").textContent = document.getElementById(id).getAttribute("value");
+                document.getElementById("selectTable").setAttribute("value",document.getElementById(id).getAttribute("value"));
+            }
+        </script>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col"  th:each="elem : ${allColumns}" th:text="${elem}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="i : ${allDataFromTable}">
+        <td th:each="j : ${i}" th:text="${j}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="container mt-5">
+    <div th:each="elem : ${allElement}" class="alert alert-info mt-2">
+        <h3 th:text="${elem.number}"/>
+    </div>
+</div>
+
+<div th:insert="~{../service/footer :: footer}"></div>
+</body>
+</html>

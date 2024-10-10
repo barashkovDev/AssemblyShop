@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{header_shop :: header}"></div>
+
+<form method="post">
+<!--    <div>-->
+<!--        <label style="padding-right: 5px; padding-left: 10px; margin-top: 15px">Склад деталей</label>-->
+<!--        <div style="display: flex; align-items: center; margin-top: 10px; margin-left: 10px;">-->
+<!--            <img alt="Отчет о складе деталей" src="/images/FormComponentsWarehouse.png"-->
+<!--                 style="border: solid 1px black; margin-right: 10px;"/>-->
+<!--            <div>-->
+<!--                <a class="btn btn-secondary" download="Отчет о складе деталей"-->
+<!--                   style="border: solid 1px black" th:href="@{|/assemblyShop/download/componentsWarehouse|}">Скачать</a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <label style="padding-right: 5px; padding-left: 10px; margin-top: 15px">Детали</label>-->
+<!--        <div style="display: flex; align-items: center; margin-top: 10px; margin-left: 10px;">-->
+<!--            <img alt="Отчет о деталях" src="/images/FormDetails.png"-->
+<!--                 style="border: solid 1px black; margin-right: 10px;"/>-->
+<!--            <div>-->
+<!--                <a class="btn btn-secondary" download="Отчет о деталях" style="border: solid 1px black"-->
+<!--                   th:href="@{|/assemblyShop/download/details|}">Скачать</a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div>
+        <label style="padding-right: 5px; padding-left: 10px; margin-top: 15px">Максимальная вместимость товаров на складе</label>
+        <div style="display: flex; align-items: center; margin-top: 10px; margin-left: 10px;">
+            <img alt="Склад изделий" src="/images/FormGoodsMaxCapacity.png"
+                 style="border: solid 1px black; margin-right: 10px;"/>
+            <div>
+                <a class="btn btn-secondary" download="Отчет о максимальной вместимости товаров" style="border: solid 1px black"
+                   th:href="@{|/assemblyShop/download/goodsMaxCapacity|}">Скачать</a>
+            </div>
+        </div>
+    </div>
+    <div>
+        <label style="padding-right: 5px; padding-left: 10px; margin-top: 15px">Общее количество товаров на складе</label>
+        <div style="display: flex; align-items: center; margin-top: 10px; margin-left: 10px;">
+            <img alt="Изделия" src="/images/FormReportGoods.png"
+                 style="border: solid 1px black; margin-right: 10px;"/>
+            <div>
+                <a class="btn btn-secondary" download="Отчет о товарах на складе" style="border: solid 1px black"
+                   th:href="@{|/assemblyShop/download/goodsCount|}">Скачать</a>
+            </div>
+        </div>
+    </div>
+<!--    <div>-->
+<!--        <label style="padding-right: 5px; padding-left: 10px; margin-top: 15px">Все планы по выпуску изделий на-->
+<!--            месяц</label>-->
+<!--        <div style="display: flex; align-items: center; margin-top: 10px; margin-left: 10px;">-->
+<!--            <img alt="Все планы по выпуску изделий на месяц" src="/images/FormMonthlyPlan.png"-->
+<!--                 style="border: solid 1px black; margin-right: 10px;"/>-->
+<!--            <div>-->
+<!--                <a class="btn btn-secondary" download="Отчет обо всех планах по выпуску изделий"-->
+<!--                   style="border: solid 1px black"-->
+<!--                   th:href="@{|/assemblyShop/download/monthlyPlan|}">Скачать</a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div>-->
+<!--        <label style="padding-right: 5px; padding-left: 10px; margin-top: 15px">Общее количество товаров на складе</label>-->
+<!--        <div style="display: flex; align-items: center; margin-top: 10px; margin-left: 10px;">-->
+<!--            <img alt="Все планы по выпуску изделий на месяц" src="/images/FormMonthlyPlan.png"-->
+<!--                 style="border: solid 1px black; margin-right: 10px;"/>-->
+<!--            <div>-->
+<!--                <a class="btn btn-secondary" download="Отчет об изделиях" style="border: solid 1px black"-->
+<!--                   th:href="@{|/assemblyShop/download/goods|}">Скачать</a>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+</form>
+
+<div style="position: fixed; bottom: 0; width: 100%;" th:insert="~{footer_shop :: footer}"/>
+</body>
+</html>

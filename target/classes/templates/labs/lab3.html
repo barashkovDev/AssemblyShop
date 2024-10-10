@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{blocks/header :: header}"></div>
+
+<form method="post">
+    <div class="dropdownProduct">
+        <button class="btn btn-secondary dropdown-toggle" type="submit" id="dropButtonPr" data-bs-toggle="dropdown"
+                aria-expanded="false" name="dropPr" th:text="${selectProduct}">
+        </button>
+        <ul class="dropdown-menu">
+            <input type="hidden" name="selectProduct" id="selectProduct" th:value="${selectProduct}"/>
+            <li th:each="i : ${allProducts}">
+                <button th:each="j : ${i}" class="dropdown-item" name="" type="button" th:text="${j}" onclick="
+                changeDropButtonName(document.getElementById('dropButtonPr').id,this.textContent);
+                changeDropOnAction('selectProduct',this.textContent)">
+                </button>
+            </li>
+        </ul>
+
+        <button class="btn btn-secondary dropdown-toggle" type="submit" id="dropButtonSh" data-bs-toggle="dropdown"
+                aria-expanded="false" name="dropSh" th:text="${selectShop}">
+        </button>
+        <ul class="dropdown-menu">
+            <input type="hidden" id="selectShop" name="selectShop" th:value="${selectShop}"/>
+            <li th:each="i : ${allShops}">
+                <button th:each="j : ${i}" class="dropdown-item" name="" th:text="${j}" type="button" onclick="
+                changeDropButtonName(document.getElementById('dropButtonSh').id,this.textContent);
+                changeDropOnAction('selectShop',this.textContent)">
+                </button>
+            </li>
+        </ul>
+
+        <button type="submit" name="action" id="printButton" value="display" th:disabled="${disabled}" class="btn btn-secondary">Отобразить</button>
+        <br>
+        <label class="form-label" th:type="${hiddenSetting}" th:text="${messagePerson}"></label>
+        <script>
+            function changeDropOnAction(classID,text){
+                document.getElementById(classID).setAttribute('value',text);
+            }
+
+            function changeDropButtonName(classID,text){
+                if (document.getElementById("dropButtonSh").textContent !== "Магазины" || document.getElementById("dropButtonPr").textContent !== "Продукты")
+                    document.getElementById("printButton").disabled = false;
+                document.getElementById(classID).textContent = text;
+            }
+        </script>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col" th:each="elem : ${nameColumnsTable}" th:text="${elem}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="i : ${dataTable}">
+        <td th:each="j : ${i}" th:text="${j}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<br>
+
+<div th:if="${boolEdit}">
+    <form method="post">
+        <div class="input" style="display: flex">
+
+            <div class="changeProductDrop" style="padding-right: 5px">
+                <button class="btn btn-secondary dropdown-toggle" type="submit" id="dropButtonChangeProduct" data-bs-toggle="dropdown"
+                        aria-expanded="false" style="max-height: 58px; padding-right: 5px" name="dropPr" th:text="${saveChangeProduct}">
+                </button>
+                <ul class="dropdown-menu">
+                    <input type="hidden" name="changeProduct" id="changeProduct" th:value="${saveChangeProduct}"/>
+                    <li th:each="i : ${allProducts}">
+                        <button th:each="j : ${i}" class="dropdown-item" name="" type="button" th:text="${j}" onclick="
+                    changeDropButtonName(document.getElementById('dropButtonChangeProduct').id,this.textContent);
+                    changeDropOnAction('changeProduct',this.textContent)">
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="changeShopDrop" style="padding-right: 5px">
+                <button class="btn btn-secondary dropdown-toggle" type="submit" id="dropButtonChangeShop" data-bs-toggle="dropdown"
+                        aria-expanded="false" style="max-height: 58px" name="dropSh" th:text="${saveChangeShop}">
+                </button>
+                <ul class="dropdown-menu">
+                    <input type="hidden" id="changeShop" name="changeShop" th:value="${saveChangeShop}"/>
+                    <li th:each="i : ${allShops}">
+                        <button th:each="j : ${i}" class="dropdown-item" name="" th:text="${j}" type="button" onclick="
+                    changeDropButtonName(document.getElementById('dropButtonChangeShop').id,this.textContent);
+                    changeDropOnAction('changeShop',this.textContent)">
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="form-floating mb-3" style="padding-right: 5px; max-height: 40px">
+                <input type="text" class="form-control" name="price" id="price" placeholder="0" style="max-width: 200px">
+                <label for="price">Цена товара</label>
+            </div>
+            <div class="form-floating mb" style="padding-right: 5px">
+                <input type="text" class="form-control" name="amount" id="amount" placeholder="0" style="max-width: 200px">
+                <label for="price">Количество товара</label>
+            </div>
+
+            <br>
+
+            <div>
+                <button type="submit" name="action" id="addButton" value="change" style="max-height: 58px" class="btn btn-secondary" th:text="${buttonEditText}">Отобразить</button>
+            </div>
+        </div>
+        <button type="submit" th:hidden="${hiddenDelButton}" name="action" id="delButton" value="delete" style="max-height: 58px; padding-left: 5px;position: relative;
+        top: -58px;
+        right: -1200px;" class="btn btn-danger">Удалить</button>
+        <label class="errorChange" th:type="${errorChangeParams}" th:text="${errorReason}"></label>
+    </form>
+</div>
+
+<div class="container mt-5">
+    <div th:each="elem : ${allDocs}" class="alert alert-info mt-2">
+        <h3 th:text="${elem}"/>
+    </div>
+</div>
+
+<div th:insert="~{../service/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<div th:fragment="delete">
+    <form method="post">
+        <button class="btn btn-danger" data-bs-target="#deleteModal" data-bs-toggle="modal" type="button">Удаление
+        </button>
+        <div aria-hidden="true" aria-labelledby="deleteModalLabel" class=" modal fade
+    " id="deleteModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Удаление записи</h1>
+                        <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="dropdownDelId">Выберите запись для удаления:</label>
+                                <select class="form-control" id="dropdownDelId" name="dropdownDelId">
+                                    <option selected text="" value=""></option>
+                                    <option th:each="cur : ${allEntryThisModel}" th:text="${cur.text}"
+                                            th:value="${cur.value}"></option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                        <button class="btn btn-danger" id="delButton" name="action" type="submit" value="delete">
+                            Удалить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+
+        $("#delButton").click(function (event) {
+            event.preventDefault();
+
+            var delIdEntry = document.getElementById("dropdownDelId").value;
+            if (delIdEntry === '') {
+                alert("Пожалуйста, выберите запись для удаления");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '[[${targetURL}]]',
+                data: {
+                    action: "delete",
+                    delIdEntry: delIdEntry,
+                },
+                success: function (response) {
+                    if (response.success === 'true') {
+                        location.reload(true);
+                    } else {
+                        alert("Данную запись нельзя удалить, тк на нее ссылаются.");
+                    }
+                },
+                error: function () {
+                    alert("Ошибка при получении данных.");
+                }
+            });
+        });
+    </script>
+</div>

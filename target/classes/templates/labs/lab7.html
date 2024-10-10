@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{blocks/header :: header}"></div>
+
+<form method="post">
+    <div style="display: flex; text-align: center;justify-content:space-between;margin: 10px;padding: 0;">
+        <div style="align-items: center;">
+            <img src="/images/FormReportFirst.PNG" alt="ФормаОтчета1" style="border: solid 1px black; margin-bottom: 5px"/>
+            <div>
+                <a th:href="@{|/labs/lab7/download/reportFirst|}" download="Отчет отдельно по магазинам" class="btn btn-secondary" style="border: solid 1px black">Скачать 1 отчёт</a>
+            </div>
+        </div>
+        <div style="align-items: center;">
+            <img src="/images/FormReportSecond.PNG" alt="ФормаОтчета2" style="border: solid 1px black"/>
+            <div style="position: relative; bottom: -153px;">
+                <a th:href="@{|/labs/lab7/download/reportSecond|}"  download="Перекрестный отчет" class="btn btn-secondary" style="border: solid 1px black">Скачать 2 отчёт</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div th:insert="~{../service/footer :: footer}"></div>
+</body>
+</html>

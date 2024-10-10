@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{header_shop :: header}"></div>
+
+<div th:insert="~{../service/filter_table :: filter_table}"></div>
+
+<div id="table-content">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col" th:each="elem : ${nameColumnsTable}" th:text="${elem}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="i : ${dataTable}">
+            <td th:each="j : ${i}" th:text="${j}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-1">
+        <button class="btn btn-primary" data-bs-target="#changeEntryModal" data-bs-toggle="modal" type="button">
+            Редактирование
+        </button>
+    </div>
+    <div class="col-sm-1">
+        <button class="btn btn-success" data-bs-target="#addEntryModal" data-bs-toggle="modal" type="button">
+            Добавление
+        </button>
+    </div>
+    <div class="col-sm-1">
+        <div th:insert="~{CUD_panel/delete_shop :: delete}"></div>
+    </div>
+</div>
+
+<form method="post" onsubmit="return validateProductForm('change')">
+    <div aria-hidden="true" aria-labelledby="changeEntryLabel" class="modal fade" id="changeEntryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="changeEntryLabel">Редактирование изделия</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dropdownChangeProduct">Изделие:</label>
+                            <select class="form-control" id="dropdownChangeProduct" name="dropdownChangeProduct">
+                                <option selected text="" value=""></option>
+                                <option th:each="cur : ${allEntryThisModel}" th:text="${cur.text}"
+                                        th:value="${cur.value}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeName">Наименование:</label>
+                            <input class="form-control" id="changeName" name="changeName" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeWeight">Вес:</label>
+                            <input class="form-control" id="changeWeight" name="changeWeight" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeColor">Цвет:</label>
+                            <input class="form-control" id="changeColor" name="changeColor" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changePrice">Цена:</label>
+                            <input class="form-control" id="changePrice" min="0" name="changePrice" type="number">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeDescription">Описание:</label>
+                            <input class="form-control" id="changeDescription" name="changeDescription" type="text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-primary" id="changeButton" name="action" type="submit" value="change">
+                        Изменить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form method="post" onsubmit="return validateProductForm('add')">
+    <div aria-hidden="true" aria-labelledby="addEntryModalLabel" class="modal fade" id="addEntryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addEntryModalLabel">Добавление изделия</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addName">Наименование:</label>
+                            <input class="form-control" id="addName" name="addName" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addWeight">Вес:</label>
+                            <input class="form-control" id="addWeight" name="addWeight" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addColor">Цвет:</label>
+                            <input class="form-control" id="addColor" name="addColor" type="text">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addPrice">Цена:</label>
+                            <input class="form-control" id="addPrice" min="0" name="addPrice" type="number">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addDescription">Описание:</label>
+                            <input class="form-control" id="addDescription" name="addDescription" type="text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-success" id="addButton" name="action" type="submit" value="add">Добавить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div th:insert="~{manufacturing :: manufacturing_detail}"></div>
+<div th:insert="~{footer_shop :: footer}"></div>
+</body>
+<script>
+    $("#dropdownChangeProduct").change(function () {
+        var selectedProductId = $(this).val();
+        if (selectedProductId === '') {
+            $("#changeName").val('');
+            $("#changeWeight").val('');
+            $("#changeColor").val('');
+            $("#changePrice").val('');
+            $("#changeDescription").val('');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/products",
+            data: {
+                action: "getInfoSelectProduct",
+                id: selectedProductId
+            },
+            success: function (response) {
+                $("#changeName").val(response.name);
+                $("#changeWeight").val(response.weight);
+                $("#changeColor").val(response.color);
+                $("#changePrice").val(response.price);
+                $("#changeDescription").val(response.description);
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function validateProductForm(formType) {
+        if (formType === 'change' && document.getElementById('dropdownChangeProduct').value.trim() === '') {
+            alert("Пожалуйста, заполните поле 'Изделие'")
+            return false;
+        }
+        var nameValue = document.getElementById(formType === 'change' ? 'changeName' : 'addName').value;
+        var priceValue = document.getElementById(formType === 'change' ? 'changePrice' : 'addPrice').value;
+        if (nameValue.trim() === '' || priceValue.trim() === '') {
+            alert('Пожалуйста, заполните поля "Наименование" и "Цена"');
+            return false;
+        }
+        var weight = document.getElementById(formType === 'change' ? 'changeWeight' : 'addWeight').value;
+        if (isNaN(weight) || parseFloat(weight) < 0) {
+            alert('"Вес" должен быть дробным положительным');
+            return false;
+        }
+        return true;
+    }
+</script>
+</html>

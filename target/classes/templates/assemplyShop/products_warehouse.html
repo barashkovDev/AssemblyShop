@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{header_shop :: header}"></div>
+
+<div th:insert="~{../service/filter_table :: filter_table}"></div>
+
+<div id="table-content">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col" th:each="elem : ${nameColumnsTable}" th:text="${elem}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="i : ${dataTable}">
+            <td th:each="j : ${i}" th:text="${j}"></td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th scope="col" style="background-color: lightblue; color: black;" th:each="elem : ${result}"
+                th:text="${elem}"></th>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-1">
+        <button class="btn btn-primary" data-bs-target="#changeEntryModal" data-bs-toggle="modal" type="button">
+            Редактирование
+        </button>
+    </div>
+    <div class="col-sm-1">
+        <button class="btn btn-success" data-bs-target="#addEntryModal" data-bs-toggle="modal" type="button">
+            Добавление
+        </button>
+    </div>
+    <div class="col-sm-1">
+        <div th:insert="~{CUD_panel/delete_shop :: delete}"></div>
+    </div>
+</div>
+
+<form method="post" onsubmit="return validateForm('change')">
+    <div aria-hidden="true" aria-labelledby="changeEntryLabel" class="modal fade" id="changeEntryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="changeEntryLabel">Редактирование ячейки изделия</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dropdownChangePW">Ячейка склада:</label>
+                            <select class="form-control" id="dropdownChangePW" name="dropdownChangePW">
+                                <option selected text="" value=""></option>
+                                <option th:each="cur : ${allEntryThisModel}" th:text="${cur.text}"
+                                        th:value="${cur.value}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dropdownChangeProduct">Изделие:</label>
+                            <select class="form-control" id="dropdownChangeProduct" name="dropdownChangeProduct">
+                                <option selected text="" value=""></option>
+                                <option th:each="cur : ${allProducts}" th:text="${cur.text}"
+                                        th:value="${cur.value}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeAvailability">Текущее количество:</label>
+                            <input class="form-control" id="changeAvailability" min="0" name="changeAvailability"
+                                   type="number">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeMaximum">Максимальное количество:</label>
+                            <input class="form-control" id="changeMaximum" min="0" name="changeMaximum" type="number">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-primary" id="changeButton" name="action" type="submit" value="change">
+                        Изменить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form method="post" onsubmit="return validateForm('add')">
+    <div aria-hidden="true" aria-labelledby="addEntryModalLabel" class="modal fade" id="addEntryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addEntryModalLabel">Добавление ячейки изделия</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dropdownAddProduct">Изделие:</label>
+                            <select class="form-control" id="dropdownAddProduct" name="dropdownAddProduct">
+                                <option selected text="" value=""></option>
+                                <option th:each="cur : ${allProducts}" th:text="${cur.text}"
+                                        th:value="${cur.value}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addAvailability">Текущее количество:</label>
+                            <input class="form-control" id="addAvailability" min="0" name="addAvailability"
+                                   type="number">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addMaximum">Максимальное количество:</label>
+                            <input class="form-control" id="addMaximum" min="0" name="addMaximum" type="number">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-success" id="addButton" name="action" type="submit" value="add">Добавить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div th:insert="~{footer_shop :: footer}"></div>
+</body>
+<script>
+    $("#dropdownChangePW").change(function () {
+        var selectedPWId = $(this).val();
+        if (selectedPWId === '') {
+            $("#dropdownChangeProduct").val('');
+            $("#changeAvailability").val('');
+            $("#changeMaximum").val('');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/productsWarehouse",
+            data: {
+                action: "getInfoSelectPW",
+                id: selectedPWId
+            },
+            success: function (response) {
+                $("#dropdownChangeProduct").val(response.productList);
+                $("#changeAvailability").val(response.availability);
+                $("#changeMaximum").val(response.maximum);
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function validateForm(formType) {
+        if (formType === 'change' && document.getElementById('dropdownChangePW').value.trim() === '') {
+            alert("Пожалуйста, заполните поле 'Ячейка склада'")
+            return false;
+        }
+        var dropdownProduct = document.getElementById(formType === 'change' ? 'dropdownChangeProduct' : 'dropdownAddProduct').value;
+        var maximumValue = document.getElementById(formType === 'change' ? 'changeMaximum' : 'addMaximum').value;
+        if (maximumValue.trim() === '' || dropdownProduct.trim() === '') {
+            alert("Пожалуйста, заполните поля 'Изделие' и 'Максимальное количество'");
+            return false;
+        }
+        var availabilityInt = parseInt(document.getElementById(formType === 'change' ? 'changeAvailability' : 'addAvailability').value);
+        if (availabilityInt > parseInt(maximumValue)) {
+            alert("'Максимальное количество' должно быть больше или равно 'Текущего количества'");
+            return false;
+        }
+        return true;
+    }
+</script>
+</html>

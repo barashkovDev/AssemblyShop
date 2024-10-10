@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{header_shop :: header}"></div>
+
+
+<h1>Фирма</h1>
+
+<div th:insert="~{footer_shop :: footer}"></div>
+</body>
+</html>

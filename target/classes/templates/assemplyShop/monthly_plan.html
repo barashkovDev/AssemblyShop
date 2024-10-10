@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{header_shop :: header}"></div>
+
+<div class="form-group row" style="margin-top: 40px;">
+    <label class="col-sm-1 col-form-label" for="dropdownMonthlyPlans" style="margin-left: 5px">Месячные планы</label>
+    <div class="col-sm-1">
+        <select class="form-control" id="dropdownMonthlyPlans" name="dropdownMonthlyPlans">
+            <option selected text="" value=""></option>
+            <option th:each="cur : ${allPlans}" th:text="${cur.text}"
+                    th:value="${cur.value}"></option>
+        </select>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-success" id="addMonthlyPlanButton" type="button">Добавить месячный план</button>
+    </div>
+    <div class="col-sm-2">
+        <button class="btn btn-danger" id="delMonthlyPlanButton" type="button">Удалить месячный план</button>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="addMonthlyPlanModalLabel" class="modal fade" id="addMonthlyPlanModal"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addMonthlyPlanModalLabel">Добавление месячного плана</h1>
+                <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="dropdownAddMPMonth">Месяц:</label>
+                        <select class="form-control" id="dropdownAddMPMonth"
+                                name="dropdownAddMPMonth">
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dropdownAddMPProduct">Изделие:</label>
+                        <select class="form-control" id="dropdownAddMPProduct"
+                                name="dropdownAddMPProduct">
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="col-form-label" for="addMPAvailability">Текущее количество:</label>
+                        <input class="form-control" id="addMPAvailability" min="0" name="addMPAvailability"
+                               type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label class="col-form-label" for="addMPNeed">Необходимое количество:</label>
+                        <input class="form-control" id="addMPNeed" min="0" name="addMPNeed" type="number">
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                <button class="btn btn-success" id="addMonthlyPlanButtonModal" type="button">Добавить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="delMonthlyPlanModalLabel" class="modal fade" id="delMonthlyPlanModal"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="delMonthlyPlanModalLabel">Удаление месячного плана</h1>
+                <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="dropdownDelMPMonth">Месяц:</label>
+                        <select class="form-control" id="dropdownDelMPMonth"
+                                name="dropdownDelMPMonth">
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                <button class="btn btn-danger" id="delMonthlyPlanButtonModal" type="button">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="element-to-hide d-none" id="monthlyPlan">
+    <div id="table-content-products" style="margin-top: 10px">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col" th:each="elem : ${nameColumnsProductsMPTable}" th:text="${elem}"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="form-group row">
+        <div class="col-sm-1">
+            <button class="btn btn-primary" data-bs-target="#changeProductMPModal" data-bs-toggle="modal"
+                    type="button">
+                Редактирование
+            </button>
+        </div>
+        <div class="col-sm-1">
+            <button class="btn btn-success" data-bs-target="#addProductMPModal" data-bs-toggle="modal"
+                    type="button">
+                Добавление
+            </button>
+        </div>
+        <div class="col-sm-1">
+            <button class="btn btn-danger" data-bs-target="#delProductMPModal" data-bs-toggle="modal"
+                    type="button">
+                Удаление
+            </button>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="changeProductMPModalLabel" class="modal fade" id="changeProductMPModal"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="changeProductMPModalLabel">Редактирование количества изделия в
+                    плане</h1>
+                <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="dropdownChangeProductMP">Изделие:</label>
+                        <select class="form-control" id="dropdownChangeProductMP" name="dropdownChangeProductMP">
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="col-form-label" for="changeProductMPAvailability">Текущее количество:</label>
+                        <input class="form-control" id="changeProductMPAvailability" name="changeProductMPAvailability"
+                               min="0" type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label class="col-form-label" for="changeProductMPNeed">Необходимое количество:</label>
+                        <input class="form-control" id="changeProductMPNeed" min="0" name="changeProductMPNeed"
+                               type="number">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                <button class="btn btn-primary" id="changeProductMPButton" type="button">Изменить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="addProductMPModalLabel" class="modal fade" id="addProductMPModal"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addProductMPModalLabel">Добавление изделия в план</h1>
+                <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="dropdownAddProductMP">Изделие:</label>
+                        <select class="form-control" id="dropdownAddProductMP" name="dropdownAddProductMP">
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="col-form-label" for="addProductMPAvailability">Текущее количество:</label>
+                        <input class="form-control" id="addProductMPAvailability" name="addProductMPAvailability"
+                               min="0" type="number">
+                    </div>
+                    <div class="mb-3">
+                        <label class="col-form-label" for="addProductMPNeed">Необходимое количество:</label>
+                        <input class="form-control" id="addProductMPNeed" min="0" name="addProductMPNeed" type="number">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                <button class="btn btn-success" id="addProductMPButton" type="button">Добавить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="delProductMPModalLabel" class="modal fade" id="delProductMPModal"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="delProductMPModalLabel">Удаление детали из схемы</h1>
+                <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="dropdownDelProductMP">Изделие:</label>
+                        <select class="form-control" id="dropdownDelProductMP" name="dropdownDelProductMP">
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                <button class="btn btn-danger" id="delProductMPButton" type="button">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:insert="~{footer_shop :: footer}"></div>
+</body>
+<script>
+
+    //подготовка модальной формы к добавлению плана
+    $("#addMonthlyPlanButton").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "infoForAddMonthlyPlan",
+            },
+            success: function (response) {
+                setFreeMonths(response.freeMonths);
+                setProductsForNewMP(response.products)
+                $('#addMonthlyPlanModal').modal('show');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function setFreeMonths(freeMonths) {
+        $('#dropdownAddMPMonth').empty();
+        $('#dropdownAddMPMonth').append('<option text="" value="" selected></option>');
+        if (freeMonths === null) {
+            return;
+        }
+        freeMonths.forEach(function (row) {
+            $('#dropdownAddMPMonth').append('<option value="' + row.value + '">' + row.text + '</option>');
+        });
+    }
+
+    function setProductsForNewMP(products) {
+        $('#dropdownAddMPProduct').empty();
+        $('#dropdownAddMPProduct').append('<option text="" value="" selected></option>');
+        if (products === null) {
+            return;
+        }
+        products.forEach(function (row) {
+            $('#dropdownAddMPProduct').append('<option value="' + row.value + '">' + row.text + '</option>');
+        });
+    }
+
+    //Добавление нового плана
+    $("#addMonthlyPlanButtonModal").click(function () {
+        var month = document.getElementById('dropdownAddMPMonth').value;
+        var product = document.getElementById('dropdownAddMPProduct').value;
+        var need_amount = document.getElementById('addMPNeed').value;
+        if (month.trim() === '' || product.trim() === '' || need_amount.trim() === '') {
+            alert("Пожалуйста, заполните 'Месяц', 'Деталь', 'Необходимое количество'");
+            return;
+        }
+        var availability_amount = document.getElementById('addMPAvailability').value;
+        if (parseInt(availability_amount) > parseInt(need_amount)) {
+            alert("'Необходимое количество' должно быть больше или равно 'Текущего количества'");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "addMonthlyPlan",
+                month: month,
+                product: product,
+                availabilityAmount: availability_amount,
+                needAmount: need_amount
+            },
+            success: function (response) {
+                updateAllPlans(response.allPlans);
+                $('#addMonthlyPlanModal').modal('hide');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function updateAllPlans(allPlans) {
+        $('#dropdownMonthlyPlans').empty();
+        $('#dropdownMonthlyPlans').append('<option text="" value="" selected></option>');
+        if (allPlans === null) {
+            return;
+        }
+        allPlans.forEach(function (row) {
+            $('#dropdownMonthlyPlans').append('<option value="' + row.value + '">' + row.text + '</option>');
+        });
+    }
+
+    //подготовка модальной формы к удалению плана
+    $("#delMonthlyPlanButton").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "infoForDelMonthlyPlan",
+            },
+            success: function (response) {
+                setDelMonths(response.allPlans);
+                $('#delMonthlyPlanModal').modal('show');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function setDelMonths(allPlans) {
+        $('#dropdownDelMPMonth').empty();
+        $('#dropdownDelMPMonth').append('<option text="" value="" selected></option>');
+        if (allPlans === null) {
+            return;
+        }
+        allPlans.forEach(function (row) {
+            $('#dropdownDelMPMonth').append('<option value="' + row.value + '">' + row.text + '</option>');
+        });
+    }
+
+    //Удаление плана
+    $("#delMonthlyPlanButtonModal").click(function () {
+        var month = document.getElementById('dropdownDelMPMonth').value;
+        if (month.trim() === '') {
+            alert("Пожалуйста, заполните 'Месяц'");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "delMonthlyPlan",
+                month: month,
+            },
+            success: function (response) {
+                updateAllPlans(response.allPlans);
+                $('#delMonthlyPlanModal').modal('hide');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    //детализация плана
+    $("#dropdownMonthlyPlans").change(function () {
+        var selectedMonthlyPlan = $(this).val();
+        const plansDiv = document.getElementById("monthlyPlan");
+        if (selectedMonthlyPlan === '') {
+            if (!plansDiv.classList.contains("d-none")) {
+                plansDiv.classList.add("d-none");
+            }
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "infoAboutMonthlyPlan",
+                month: selectedMonthlyPlan
+            },
+            success: function (response) {
+                generalUpdatePlan(response);
+                plansDiv.classList.remove("d-none");
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function generalUpdatePlan(response) {
+        updatePlan(response.productsForPlan);
+        setProductForSelect(response.productsForPlan);
+        setNewProductForAdd(response.newProductsForPlan);
+    }
+
+    function updatePlan(productsForPlan) {
+        $("#table-content-products tbody").html("");
+        if (productsForPlan === null) {
+            return;
+        }
+        productsForPlan.forEach(function (row) {
+            var newRow = $("<tr>");
+            row.forEach(function (cell) {
+                newRow.append($("<td>").text(cell));
+            });
+            $("#table-content-products tbody").append(newRow);
+        });
+    }
+
+    function setProductForSelect(productsForPlan) {
+        //выбор изделия для редактирования
+        $('#dropdownChangeProductMP').empty();
+        $('#dropdownChangeProductMP').append('<option text="" value="" selected></option>');
+        if (productsForPlan === null) {
+            return;
+        }
+        productsForPlan.forEach(function (row) {
+            $('#dropdownChangeProductMP').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+        });
+        //выбор изделия для удаления
+        $('#dropdownDelProductMP').empty();
+        $('#dropdownDelProductMP').append('<option text="" value="" selected></option>');
+        if (productsForPlan === null) {
+            return;
+        }
+        productsForPlan.forEach(function (row) {
+            $('#dropdownDelProductMP').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+        });
+    }
+
+    function setNewProductForAdd(newProductsForPlan) {
+        $('#dropdownAddProductMP').empty();
+        $('#dropdownAddProductMP').append('<option text="" value="" selected></option>');
+        if (newProductsForPlan === null) {
+            return;
+        }
+        newProductsForPlan.forEach(function (row) {
+            $('#dropdownAddProductMP').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+        });
+    }
+
+    //подставление значений при редактировании изделия плана
+    $("#dropdownChangeProductMP").change(function () {
+        var selectedProductMP = $(this).val();
+        if (selectedProductMP === '') {
+            alert("Пожалуйста, выберите 'Изделие'");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "infoAboutProductMonthlyPlan",
+                productId: selectedProductMP
+            },
+            success: function (response) {
+                $("#changeProductMPAvailability").val(response.availabilityAmount);
+                $("#changeProductMPNeed").val(response.needAmount);
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    //"Редактировать" изделие плана
+    $("#changeProductMPButton").click(function () {
+        var productId = document.getElementById('dropdownChangeProductMP').value;
+        var need = document.getElementById('changeProductMPNeed').value;
+        if (productId.trim() === '' || need.trim() === '') {
+            alert("Пожалуйста, заполните 'Изделие' и 'Необходимое количество'");
+            return;
+        }
+        var availability = document.getElementById('changeProductMPAvailability').value;
+        if (parseInt(availability) > parseInt(need)) {
+            alert("'Необходимое количество' должно быть больше или равно 'Текущего количества'");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "changeProductMP",
+                productId: productId,
+                availability: availability,
+                need: need
+            },
+            success: function (response) {
+                generalUpdatePlan(response);
+                $('#changeProductMPModal').modal('hide');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    //Добавление изделия плану
+    $("#addProductMPButton").click(function () {
+        var productId = document.getElementById('dropdownAddProductMP').value;
+        var need = document.getElementById('addProductMPNeed').value;
+        if (productId.trim() === '' || need.trim() === '') {
+            alert("Пожалуйста, заполните 'Изделие' и 'Необходимое количество'");
+            return;
+        }
+        var availability = document.getElementById('addProductMPAvailability').value;
+        if (parseInt(availability) > parseInt(need)) {
+            alert("'Необходимое количество' должно быть больше или равно 'Текущего количества'");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "addProductMP",
+                productId: productId,
+                availability: availability,
+                need: need
+            },
+            success: function (response) {
+                generalUpdatePlan(response);
+                $('#addProductMPModal').modal('hide');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    //Удаление изделия из плана
+    $("#delProductMPButton").click(function () {
+        var productId = document.getElementById('dropdownDelProductMP').value;
+        if (productId.trim() === '') {
+            alert("Пожалуйста, выберите 'Изделие'");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "delProductMP",
+                productId: productId
+            },
+            success: function (response) {
+                generalUpdatePlan(response);
+                $('#delProductMPModal').modal('hide');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+</script>
+</html>

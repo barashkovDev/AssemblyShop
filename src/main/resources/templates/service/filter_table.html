@@ -1,0 +1,165 @@
+<div th:fragment="filter_table">
+    <div id="filter-form">
+        <form method="post">
+            <div class="window" style="margin-top: 10px">
+                <div class="fillingElem" style="display: flex; align-items: center">
+                    <label style="padding-right: 5px; padding-left: 5px">Фильтр</label>
+
+                    <button aria-expanded="false" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                            id="dropButtonColumn" name="dropButtonColumn"
+                            th:text="${selectColumnFilter}" type="submit">
+                    </button>
+                    <ul class="dropdown-menu">
+                        <input id="selectColumnFilter" name="selectColumnFilter" th:value="${selectColumnFilter}"
+                               type="hidden"/>
+                        <li th:each="i : ${listFilterColumns}">
+                            <button class="dropdown-item" name="" onclick="
+                            changeDropButtonName(document.getElementById('dropButtonColumn').id,this.textContent);
+                            changeDropOnAction('selectColumnFilter',this.textContent)" th:each="j : ${i}" th:text="${j}"
+                                    type="button">
+                            </button>
+                        </li>
+                    </ul>
+
+                    <button aria-expanded="false" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                            id="dropButtonFilter" name="dropButtonFilter"
+                            style="margin-left: 5px; margin-right: 5px"
+                            th:text="${selectTypeFilter}"
+                            type="submit">
+                    </button>
+                    <ul class="dropdown-menu">
+                        <input id="selectTypeFilter" name="selectTypeFilter" th:value="${selectTypeFilter}"
+                               type="hidden"/>
+                        <li th:each="i : ${listFilterTypes}">
+                            <button class="dropdown-item" name="" onclick="
+                            changeDropButtonName(document.getElementById('dropButtonFilter').id,this.textContent, true);
+                            changeDropOnAction('selectTypeFilter',this.textContent)" th:each="j : ${i}" th:text="${j}"
+                                    type="button">
+                            </button>
+                        </li>
+                    </ul>
+
+                    <input class="form-control" id="valueFilter" name="valueFilter" placeholder="Значение"
+                           style="max-width: 200px"
+                           th:value="${inputText}"
+                           type="text">
+
+                    <button class="btn btn-secondary" id="displayFilterTable" name="action" style="margin-left: 5px"
+                            type="submit"
+                            value="filter">
+                        Отфильтровать
+                    </button>
+                    <button class="btn btn-secondary" id="reset" name="action" style="margin-left: 5px" type="submit"
+                            value="reset">
+                        Сброс
+                    </button>
+
+                    <div class="dropdown" style="margin-left: 5px">
+                        <button aria-expanded="false" class="btn btn-secondary dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                                id="dropdownMenuButton" type="button">
+                            Отоброжаемые колонки
+                        </button>
+                        <ul aria-labelledby="dropdownMenuButton" class="dropdown-menu">
+                            <li th:each="option : ${options}">
+                                <div class="form-check">
+                                    <input checked class="form-check-input" th:id="${option.id}" type="checkbox"
+                                           value="">
+                                    <label class="form-check-label" th:for="${option.forr}"
+                                           th:text="${option.text}"></label>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <label class="form-label" th:text="${messagePerson}" th:type="${hiddenErrorLabel}"></label>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkBoxes = document.querySelectorAll('.form-check-input');
+            const table = document.querySelector('.table');
+
+            checkBoxes.forEach(function (checkbox, index) {
+                checkbox.addEventListener('change', function () {
+                    const headerCells = table.querySelectorAll('th');
+                    const dataCells = table.querySelectorAll('td');
+                    const footerCells = table.querySelectorAll('tfoot th');
+
+                    if (this.checked) {
+                        headerCells[index].style.display = 'table-cell';
+                        dataCells.forEach(function (cell, i) {
+                            if (i % checkBoxes.length === index) {
+                                cell.style.display = 'table-cell';
+                            }
+                        });
+                        footerCells[index].style.display = 'table-cell';
+                    } else {
+                        headerCells[index].style.display = 'none';
+                        dataCells.forEach(function (cell, i) {
+                            if (i % checkBoxes.length === index) {
+                                cell.style.display = 'none';
+                            }
+                        });
+                        footerCells[index].style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        function changeDropOnAction(classID, text) {
+            document.getElementById(classID).setAttribute('value', text);
+        }
+
+        function changeDropButtonName(classID, text, splitFlag) {
+            document.getElementById(classID).textContent = splitFlag = text.split(" |")[0].trim();
+        }
+
+        $(document).ready(function () {
+            $("#displayFilterTable").click(function (event) {
+                event.preventDefault(); // Предотвратить перезагрузку страницы
+
+                var selectTypeFilter = $("#selectTypeFilter").val();
+                var selectColumnFilter = $("#selectColumnFilter").val();
+                var valueFilter = $("#valueFilter").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: '[[${targetURL}]]',
+                    data: {
+                        action: "filter",
+                        selectTypeFilter: selectTypeFilter,
+                        selectColumnFilter: selectColumnFilter,
+                        valueFilter: valueFilter
+                    },
+                    success: function (response) {
+                        updateTable(response.dataTable);
+                        updateFooter(response.result);
+                    },
+                    error: function () {
+                        alert("Ошибка при получении данных.");
+                    }
+                });
+            });
+
+            function updateTable(newData) {
+                $("#table-content tbody").html("");
+                newData.forEach(function (row) {
+                    var newRow = $("<tr>");
+                    row.forEach(function (cell) {
+                        newRow.append($("<td>").text(cell));
+                    });
+                    $("#table-content tbody").append(newRow);
+                });
+            }
+
+            function updateFooter(newResult) {
+                $("#table-content tfoot tr th").each(function (index, element) {
+                    $(element).text(newResult[index]);
+                });
+            }
+        });
+    </script>
+</div>

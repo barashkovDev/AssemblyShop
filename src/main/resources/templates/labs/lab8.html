@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{blocks/header :: header}"></div>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col" th:each="elem : ${nameColumnsTable}" th:text="${elem}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="i : ${dataTable}">
+        <td th:each="j : ${i}" th:text="${j}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<form method="post">
+    <div class="input">
+        <div class="chooseNameShop" style="padding-right: 5px">
+            <button class="btn btn-secondary dropdown-toggle" type="submit" id="dropButtonChangeShop" data-bs-toggle="dropdown"
+                    aria-expanded="false" style="max-height: 58px; padding-right: 5px" name="dropPr" th:text="${shopName}">
+            </button>
+            <ul class="dropdown-menu">
+                <input type="hidden" name="shopName" id="shopName" th:value="${shopName}"/>
+                <li th:each="i : ${allShops}">
+                    <button th:each="j : ${i}" class="dropdown-item" name="" type="button" th:text="${j}" onclick="
+                    changeDropButtonName(document.getElementById('dropButtonChangeShop').id,this.textContent);
+                    changeDropOnAction('shopName',this.textContent)">
+                    </button>
+                </li>
+            </ul>
+            <input type="text" name="pricePercent" id="changePercent" placeholder="Введите процент"/>
+            <button class="btn btn-secondary" type="submit" id="change" th:disabled="${isDisable}"> Изменить</button>
+            <label class="form-label" th:type="${hiddenSetting}" th:text="${messagePerson}" th:style="${style}"></label>
+        </div>
+    </div>
+</form>
+
+<script>
+    function changeDropOnAction(classID,text){
+        document.getElementById(classID).setAttribute('value',text);
+        document.getElementById("change").disabled = false;
+    }
+
+    function changeDropButtonName(classID,text){
+        document.getElementById(classID).textContent = text;
+    }
+</script>
+
+
+<div th:insert="~{../service/footer :: footer}"></div>
+</body>
+</html>

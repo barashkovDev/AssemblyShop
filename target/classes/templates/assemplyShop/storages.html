@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{header_shop :: header}"></div>
+
+<!--<div th:insert="~{../service/filter_table :: filter_table}"></div>-->
+
+<div id="table-content">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col" th:each="elem : ${nameColumnsTable}" th:text="${elem}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="i : ${dataTable}">
+            <td th:each="j : ${i}" th:text="${j}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="form-group row">
+    <div class="col-sm-1">
+        <button class="btn btn-success" data-bs-target="#addEntryModal" data-bs-toggle="modal" type="button">
+            Добавление
+        </button>
+    </div>
+    <br/>
+    <div class="col-sm-1">
+        <button class="btn btn-primary" data-bs-target="#changeEntryModal" data-bs-toggle="modal" type="button">
+            Редактирование
+        </button>
+    </div>
+    <br/>
+    <div class="col-sm-1">
+        <div th:insert="~{CUD_panel/delete_shop :: delete}"></div>
+    </div>
+</div>
+
+<form method="post" onsubmit="return validateForm('change')">
+    <div aria-hidden="true" aria-labelledby="changeEntryLabel" class="modal fade" id="changeEntryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="changeEntryLabel">Редактирование ячейки</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dropdownChangeStorages">Ячейка склада:</label>
+                            <select class="form-control" id="dropdownChangeStorages" name="dropdownChangeStorages">
+                                <option selected text="" value=""></option>
+                                <option th:each="cur : ${allEntryThisModel}" th:text="${cur.text}"
+                                        th:value="${cur.value}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dropdownChangeGoods">Код товара:</label>
+                            <select class="form-control" id="dropdownChangeGoods" name="dropdownChangeGoods">
+                                <option selected text="" value=""></option>
+                                <option th:each="cur : ${allEntryGoodsModel}" th:text="${cur.text}"
+                                        th:value="${cur.value}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeQuantity">Количество:</label>
+                            <input class="form-control" id="changeQuantity" min="0" name="changeQuantity" type="number">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeMaxQuantity">Максимальное количество:</label>
+                            <input class="form-control" id="changeMaxQuantity" name="changeMaxQuantity" type="text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-primary" id="changeButton" name="action" type="submit" value="change">
+                        Изменить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form method="post" >
+    <div aria-hidden="true" aria-labelledby="addEntryModalLabel" class="modal fade" id="addEntryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addEntryModalLabel">Добавление товара на склад</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dropdownAddGoods">Код товара:</label>
+                            <select class="form-control" id="dropdownAddGoods" name="dropdownAddGoods">
+                                <option selected text="" value=""></option>
+                                <option th:each="cur : ${allEntryGoodsModel}" th:text="${cur.text}"
+                                        th:value="${cur.value}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addQuantity">Количество:</label>
+                            <input class="form-control" id="addQuantity" min="0" name="addQuantity" type="number">
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addMaxQuantity">Максимальное количество:</label>
+                            <input class="form-control" id="addMaxQuantity" name="addMaxQuantity" type="text">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-success" id="addButton" name="action" type="submit" value="add">Добавить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div th:insert="~{footer_shop :: footer}"></div>
+</body>
+<script>
+    $("#dropdownChangeGoods").change(function () {
+        var selectedDetailId = $(this).val();
+        if (selectedDetailId === '') {
+            $("#changeName").val('');
+            $("#changeCost").val('');
+            $("#changeDescription").val('');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/goods",
+            data: {
+                action: "getInfoSelectGoods",
+                id: selectedGoodsId
+            },
+            success: function (response) {
+                $("#changeName").val(response.name);
+                $("#changeCost").val(response.cost);
+                $("#changeDescription").val(response.description);
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function validateForm(formType) {
+        if (formType === 'change' && document.getElementById('dropdownChangeGoods').value.trim() === '') {
+            alert("Пожалуйста, заполните поле 'Товар'")
+            return false;
+        }
+        var nameValue = document.getElementById(formType === 'change' ? 'changeName' : 'addName').value;
+        var priceValue = document.getElementById(formType === 'change' ? 'changeOwner' : "addOwner").value;
+        if (nameValue.trim() === '' || priceValue.trim() === '') {
+            alert("Пожалуйста, заполните поля 'Наименование' и 'Владелец'");
+            return false;
+        }
+        return true;
+    }
+        function setGoodsForSelect(productsForPlan) {
+        //выбор товара для редактирования
+        $('#dropdownChangeGoods').empty();
+        $('#dropdownChangeGoods').append('<option text="" value="" selected></option>');
+        if (productsForPlan === null) {
+            return;
+        }
+        productsForPlan.forEach(function (row) {
+            $('#dropdownChangeGoods').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+        });
+        //выбор изделия для удаления
+        $('#dropdownDelGoods').empty();
+        $('#dropdownDelGoods').append('<option text="" value="" selected></option>');
+        if (productsForPlan === null) {
+            return;
+        }
+        productsForPlan.forEach(function (row) {
+            $('#dropdownDelGoods').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+        });
+    }
+        //Добавление товара плану
+    $("#addGoodsButton").click(function () {
+        var goodsId = document.getElementById('dropdownAddGoods').value;
+        var need = document.getElementById('addProductMPNeed').value;
+        if (productId.trim() === '' || need.trim() === '') {
+            alert("Пожалуйста, заполните 'Изделие' и 'Необходимое количество'");
+            return;
+        }
+        var availability = document.getElementById('addProductMPAvailability').value;
+        if (parseInt(availability) > parseInt(need)) {
+            alert("'Необходимое количество' должно быть больше или равно 'Текущего количества'");
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/monthlyPlan",
+            data: {
+                action: "addProductMP",
+                productId: productId,
+                availability: availability,
+                need: need
+            },
+            success: function (response) {
+                generalUpdatePlan(response);
+                $('#addProductMPModal').modal('hide');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+</script>
+</html>

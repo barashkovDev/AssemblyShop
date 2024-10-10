@@ -1,0 +1,338 @@
+<div th:fragment="manufacturing_detail">
+    <div class="form-group row" style="margin-top: 40px;">
+        <label class="col-sm-2 col-form-label" for="dropdownScheme" style="margin-left: 5px">Детали для сборки
+            изделия</label>
+        <div class="col-sm-1">
+            <select class="form-control" id="dropdownScheme" name="dropdownScheme">
+                <option selected text="" value=""></option>
+                <option th:each="cur : ${allScheme}" th:text="${cur.text}"
+                        th:value="${cur.value}"></option>
+            </select>
+        </div>
+    </div>
+
+    <div class="element-to-hide d-none" id="scheme">
+        <div id="table-content-scheme" style="margin-top: 10px">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col" th:each="elem : ${nameColumnsSchemeTable}" th:text="${elem}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="i : ${dataSchemeTable}">
+                    <td th:each="j : ${i}" th:text="${j}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="form-group row">
+            <div class="col-sm-1">
+                <button class="btn btn-primary" data-bs-target="#changeSchemeEntryModal" data-bs-toggle="modal"
+                        type="button">
+                    Редактирование
+                </button>
+            </div>
+            <div class="col-sm-1">
+                <button class="btn btn-success" data-bs-target="#addSchemeEntryModal" data-bs-toggle="modal"
+                        type="button">
+                    Добавление
+                </button>
+            </div>
+            <div class="col-sm-1">
+                <button class="btn btn-danger" data-bs-target="#delSchemeEntryModal" data-bs-toggle="modal"
+                        type="button">
+                    Удаление
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="changeSchemeEntryModalLabel" class="modal fade" id="changeSchemeEntryModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="changeSchemeEntryModalLabel">Редактирование количества детали в
+                        схеме</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dropdownChangeDetailScheme">Деталь:</label>
+                            <select class="form-control" id="dropdownChangeDetailScheme"
+                                    name="dropdownChangeDetailScheme">
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="changeNeed">Необходимое количество:</label>
+                            <input class="form-control" id="changeNeed" min="0" name="changeNeed" type="number">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-primary" id="changeSchemaButton" type="button">Изменить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="addSchemeEntryModalLabel" class="modal fade" id="addSchemeEntryModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addSchemeEntryModalLabel">Добавление детали в схему</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dropdownAddDetailScheme">Деталь:</label>
+                            <select class="form-control" id="dropdownAddDetailScheme" name="dropdownAddDetailScheme">
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="col-form-label" for="addNeed">Необходимое количество:</label>
+                            <input class="form-control" id="addNeed" min="0" name="addNeed" type="number">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-success" id="addSchemaButton" type="button">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="delSchemeEntryModalLabel" class="modal fade" id="delSchemeEntryModal"
+         tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="delSchemeEntryModalLabel">Удаление детали из схемы</h1>
+                    <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dropdownDelDetailScheme">Деталь:</label>
+                            <select class="form-control" id="dropdownDelDetailScheme" name="dropdownDelDetailScheme">
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Закрыть</button>
+                    <button class="btn btn-danger" id="delSchemaButton" type="button">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //выбор схемы (те изделий)
+        $("#dropdownScheme").change(function () {
+            var selectedScheme = $(this).val();
+            const schemeDiv = document.getElementById("scheme");
+            if (selectedScheme === '') {
+                if (!schemeDiv.classList.contains("d-none")) {
+                    schemeDiv.classList.add("d-none");
+                }
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/assemblyShop/products",
+                data: {
+                    action: "getScheme",
+                    scheme: selectedScheme
+                },
+                success: function (response) {
+                    updateScheme(response);
+                    schemeDiv.classList.remove("d-none");
+                },
+                error: function () {
+                    alert("Ошибка при получении информации о ячейке.");
+                }
+            });
+        });
+
+        //выбор "Детали" при редактировании
+        $("#dropdownChangeDetailScheme").change(function () {
+            var selectedDetailScheme = $(this).val();
+            if (selectedDetailScheme === '') {
+                $("#changeNeed").val('');
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/assemblyShop/products",
+                data: {
+                    action: "getDetailForScheme",
+                    detail: selectedDetailScheme,
+                },
+                success: function (response) {
+                    $("#changeNeed").val(response.need);
+                },
+                error: function () {
+                    alert("Ошибка при получении информации о ячейке.");
+                }
+            });
+        });
+
+        //нажатие на кнопку "Изменить" при редактировании схемы
+        $("#changeSchemaButton").click(function () {
+            if (!validateSchemaForm('change')) {
+                return;
+            }
+            const changeNeed = document.getElementById("changeNeed").value;
+            $.ajax({
+                type: "POST",
+                url: "/assemblyShop/products",
+                data: {
+                    action: "changeSchema",
+                    changeNeed: changeNeed
+                },
+                success: function (response) {
+                    $('#changeSchemeEntryModal').modal('hide');
+                    updateScheme(response);
+                },
+                error: function () {
+                    alert("Ошибка при получении информации о ячейке.");
+                }
+            });
+        });
+
+        //нажатие на кнопку "Добавить" при добавлении детали в схему
+        $("#addSchemaButton").click(function () {
+            if (!validateSchemaForm('add')) {
+                return;
+            }
+            const addDetail = document.getElementById('dropdownAddDetailScheme').value;
+            const addNeed = document.getElementById("addNeed").value;
+            $.ajax({
+                type: "POST",
+                url: "/assemblyShop/products",
+                data: {
+                    action: "addSchema",
+                    addDetail: addDetail,
+                    addNeed: addNeed
+                },
+                success: function (response) {
+                    $('#addSchemeEntryModal').modal('hide');
+                    updateScheme(response);
+                },
+                error: function () {
+                    alert("Ошибка при получении информации о ячейке.");
+                }
+            });
+        });
+
+        //нажатие на кнопку "Удалить" при удалении детали из схемы
+        $("#delSchemaButton").click(function () {
+            if (!validateSchemaForm('delete')) {
+                return;
+            }
+            const delDetail = document.getElementById('dropdownDelDetailScheme').value;
+            $.ajax({
+                type: "POST",
+                url: "/assemblyShop/products",
+                data: {
+                    action: "deleteSchema",
+                    delDetail: delDetail
+                },
+                success: function (response) {
+                    $('#delSchemeEntryModal').modal('hide');
+                    updateScheme(response);
+                },
+                error: function () {
+                    alert("Ошибка при получении информации о ячейке.");
+                }
+            });
+        });
+
+        function updateScheme(response) {
+            setSelectChangeDetailScheme(response.dataTable);
+            setSelectAddDetailScheme(response.detailsForAdd);
+            updateTableScheme(response.dataTable);
+            setSelectDelDetailScheme(response.dataTable);
+        }
+
+        function updateTableScheme(dataTable) {
+            $("#table-content-scheme tbody").html("");
+            if (dataTable === null) {
+                return;
+            }
+            dataTable.forEach(function (row) {
+                var newRow = $("<tr>");
+                row.forEach(function (cell) {
+                    newRow.append($("<td>").text(cell));
+                });
+                $("#table-content-scheme tbody").append(newRow);
+            });
+        }
+
+        function setSelectChangeDetailScheme(dataTable) {
+            $('#dropdownChangeDetailScheme').empty();
+            $('#dropdownChangeDetailScheme').append('<option text="" value="" selected></option>');
+            if (dataTable === null) {
+                return;
+            }
+            dataTable.forEach(function (row) {
+                $('#dropdownChangeDetailScheme').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+            });
+        }
+
+        function setSelectAddDetailScheme(detailsForAdd) {
+            $('#dropdownAddDetailScheme').empty();
+            $('#dropdownAddDetailScheme').append('<option text="" value="" selected></option>');
+            if (detailsForAdd === null) {
+                return;
+            }
+            detailsForAdd.forEach(function (row) {
+                $('#dropdownAddDetailScheme').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+            });
+        }
+
+        function setSelectDelDetailScheme(detailsForAdd) {
+            $('#dropdownDelDetailScheme').empty();
+            $('#dropdownDelDetailScheme').append('<option text="" value="" selected></option>');
+            if (detailsForAdd === null) {
+                return;
+            }
+            detailsForAdd.forEach(function (row) {
+                $('#dropdownDelDetailScheme').append('<option value="' + row[0] + '">' + row[1] + '</option>');
+            });
+        }
+
+        function validateSchemaForm(formType) {
+            var detailSchema;
+            var need;
+            if (formType === 'delete') {
+                if (document.getElementById('dropdownDelDetailScheme').value.trim() === '') {
+                    alert('Пожалуйста, заполните поля "Деталь"');
+                    return false;
+                }
+                return true;
+            } else if (formType === 'change') {
+                detailSchema = document.getElementById('dropdownChangeDetailScheme').value;
+                need = document.getElementById('changeNeed').value;
+            } else {
+                detailSchema = document.getElementById('dropdownAddDetailScheme').value;
+                need = document.getElementById('addNeed').value;
+            }
+            if (detailSchema.trim() === '' || need.trim() === '') {
+                alert('Пожалуйста, заполните поля "Деталь" и "Необходимое количество"');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</div>

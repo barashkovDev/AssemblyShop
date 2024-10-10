@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{header_shop :: header}"></div>
+
+<h3 class="text-dark" style="margin: 10px">Изделия в производстве</h3>
+<h6 class="text-secondary" style="margin: 5px">У данных изделий есть схема производства и ячейка(и) на складе</h6>
+<div id="table-content">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col" th:each="elem : ${nameColumnsTable}" th:text="${elem}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="i : ${dataTable}">
+            <td th:each="j : ${i}" th:text="${j}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="form-group row" style="margin-top: 40px;">
+    <label class="col-sm-2 col-form-label" for="dropdownProduction" style="margin-left: 5px">Изделия для
+        производства</label>
+    <div class="col-sm-1">
+        <select class="form-control" id="dropdownProduction" name="dropdownProduction">
+            <option selected text="" value=""></option>
+            <option th:each="cur : ${allProduction}" th:text="${cur.text}"
+                    th:value="${cur.value}"></option>
+        </select>
+    </div>
+    <div class="col-sm-1">
+        <button class="btn btn-success" id="productionProductButton" type="button">Изготовить</button>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="produceProductFormModalLabel" class="modal fade" id="produceProductFormModal"
+     tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="produceProductFormModalLabel">Изготовление изделия по схеме</h1>
+                <button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div id="info-scheme-table">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Код детали</th>
+                                <th>Наименование детали</th>
+                                <th>Необходимое количество</th>
+                                <th>Текущее количество на складе</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="inputAmount" id="maximumProductionLabel"></label>
+                    <input aria-describedby="produceProductButton" aria-label="Количество" class="form-control" id="inputAmount"
+                           placeholder="Введите количество"
+                           min="1" type="number">
+                    <button class="btn btn-success" id="produceProductButton" type="button">Изготовить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:insert="~{footer_shop :: footer}"></div>
+</body>
+<script>
+
+    $("#productionProductButton").click(function () {
+        var scheme = document.getElementById("dropdownProduction").value;
+        if (scheme === '') {
+            alert("Пожалуйста, выберите изделие для производства")
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/production",
+            data: {
+                action: "produceInfo",
+                scheme: scheme
+            },
+            success: function (response) {
+                setSchemeForProduct(response);
+                $("#produceProductFormModal").modal('show');
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function setSchemeForProduct(response) {
+        $("#info-scheme-table tbody").html("");
+        if (response.infoSchemeTable === null) {
+            return;
+        }
+        response.infoSchemeTable.forEach(function (row) {
+            var newRow = $("<tr>");
+            row.forEach(function (cell) {
+                newRow.append($("<td>").text(cell));
+            });
+            $("#info-scheme-table tbody").append(newRow);
+        });
+        $("#maximumProductionLabel").text("Максимальное количество: " + response.maximumProduction);
+        if (response.maximumProduction === 0) {
+            $("#inputAmount").prop("disabled", true);
+            $("#produceProductButton").hide();
+        } else {
+            $("#inputAmount").prop("disabled", false);
+            $("#produceProductButton").show();
+        }
+    }
+
+    //TODO динамическое изменение необходимого кол-ва
+    /*$(document).ready(function() {
+        $("#info-scheme-table tbody tr td:nth-child(3)").each(function() {
+            $(this).attr("need-original-value", $(this).text());
+        });
+
+        $("#inputAmount").on("input", function() {
+            var multiplier = $(this).val();
+            if (isNaN(multiplier) || parseFloat(multiplier) <= 0) {
+                $(this).val("");
+                return;
+            }
+            $("#info-scheme-table tbody tr").each(function() {
+                $(this).find("td:nth-child(3)").text(function(index, oldText) {
+                    var originalValue = $(this).data("original-value");
+                    return parseFloat(originalValue) * multiplier;
+                });
+            });
+        });
+    });*/
+
+    //нажаите на кнопку "Изготовление" при изготовлении
+    $("#produceProductButton").click(function () {
+        var amount = document.getElementById("inputAmount").value;
+        var max = document.getElementById("maximumProductionLabel").textContent;
+        if (amount === '' || parseInt(amount) <= 0 || parseInt(amount) > parseFloat(max.slice(max.lastIndexOf(" ") + 1))) {
+            alert("Пожалуйста, введите корректное количество")
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/assemblyShop/production",
+            data: {
+                action: "produce",
+                amount: amount
+            },
+            success: function (response) {
+                $("#produceProductFormModal").modal('hide');
+                $("#dropdownProduction").val("");
+                setAllProduction(response.production);
+            },
+            error: function () {
+                alert("Ошибка при получении информации о ячейке.");
+            }
+        });
+    });
+
+    function setAllProduction(production) {
+        $("#table-content tbody").html("");
+        if (production === null) {
+            return null;
+        }
+        production.forEach(function (row) {
+            var newRow = $("<tr>");
+            row.forEach(function (cell) {
+                newRow.append($("<td>").text(cell));
+            });
+            $("#table-content tbody").append(newRow);
+        });
+    }
+
+</script>
+</html>

@@ -1,0 +1,30 @@
+--------------------Назначение на нужную схему--------------------
+SHOW search_path;
+SET search_path TO DB,assembly_shop;
+
+--------------------Создание триггера--------------------
+CREATE OR REPLACE FUNCTION update_monthly_plan()
+RETURNS TRIGGER AS $$
+DECLARE
+  old_current_amount INTEGER;
+  new_current_amount INTEGER;
+  plus_amount INTEGER;
+BEGIN
+  SELECT OLD.availability_amount INTO old_current_amount;
+  SELECT NEW.availability_amount INTO new_current_amount;
+
+  plus_amount := new_current_amount - old_current_amount;
+
+  UPDATE assembly_shop.monthly_plan
+  SET availability_amount = availability_amount + plus_amount
+  WHERE code_product = NEW.code_product AND month = (SELECT EXTRACT(MONTH FROM CURRENT_DATE));
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+--------------------Назначение триггера--------------------
+CREATE TRIGGER update_monthly_plan_trigger
+AFTER INSERT OR UPDATE ON product_warehouse
+FOR EACH ROW
+EXECUTE PROCEDURE update_monthly_plan();

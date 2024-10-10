@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${title}"/>
+    <div th:insert="~{../service/meta_info :: meta_info}"></div>
+</head>
+<body>
+<div th:insert="~{../labs/blocks/header :: header}"></div>
+
+<form method="post">
+    <div class="window">
+        <div class="fillingElem" style="display: flex; align-items: center">
+            <label style="padding-right: 5px; padding-left: 5px">Фильтр</label>
+            <input type="text" class="form-control" name="shopName" id="shopName" placeholder="Название магазина" th:value="${inputText}" style="max-width: 200px">
+            <button type="submit" name="action" id="displayTable" value="display" style="margin-left: 5px" class="btn btn-secondary">Отобразить</button>
+            <button type="submit" name="action" value="reset" style="border: none; padding: 0">
+                <img src="/images/resetButton.PNG" alt="Фото сброса к изначальным настройкам" style="background-size: cover;width: 55px; height: 53px;border: none;" />
+            </button>
+        </div>
+        <label class="form-label" th:type="${hiddenErrorLabel}" th:text="${messagePerson}"></label>
+    </div>
+    <br>
+</form>
+
+<div th:insert="~{../service/footer :: footer}"></div>
+</body>
+</html>
